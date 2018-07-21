@@ -1,7 +1,7 @@
 # Hot-Patcher
 > Hot method patching framework for handling environmental method differences
 
-[![Build Status](https://travis-ci.org/perry-mitchell/hot-patch.svg?branch=master)](https://travis-ci.org/perry-mitchell/hot-patch)
+[![Build Status](https://travis-ci.org/perry-mitchell/hot-patcher.svg?branch=master)](https://travis-ci.org/perry-mitchell/hot-patcher)
 
 ## About
 Hot-Patcher provides a simple API to manage patched methods. I found while writing [Buttercup](https://buttercup.pw) that managing overwritten methods between environments (Node/Browser/React-Native) was becoming cumbersome, and having a single _agreed-upon_ method of doing so was the best way to go.
