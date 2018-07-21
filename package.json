@@ -1,0 +1,25 @@
+{
+  "name": "hot-patch",
+  "version": "0.0.0",
+  "description": "Hot method patching framework for handling environmental method differences",
+  "main": "source/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/perry-mitchell/hot-patch.git"
+  },
+  "keywords": [
+    "patch",
+    "override",
+    "hot",
+    "patch"
+  ],
+  "author": "Perry Mitchell <perry@perrymitchell.net>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/perry-mitchell/hot-patch/issues"
+  },
+  "homepage": "https://github.com/perry-mitchell/hot-patch#readme"
+}
