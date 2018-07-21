@@ -1,30 +1,30 @@
-# Hot-Patch
+# Hot-Patcher
 > Hot method patching framework for handling environmental method differences
 
-[![Build Status](https://travis-ci.org/perry-mitchell/hot-patch.svg?branch=master)](https://travis-ci.org/perry-mitchell/hot-patch)
+[![Build Status](https://travis-ci.org/perry-mitchell/hot-patcher.svg?branch=master)](https://travis-ci.org/perry-mitchell/hot-patcher)
 
 ## About
-Hot-Patch provides a simple API to manage patched methods. I found while writing [Buttercup](https://buttercup.pw) that managing overwritten methods between environments (Node/Browser/React-Native) was becoming cumbersome, and having a single _agreed-upon_ method of doing so was the best way to go.
+Hot-Patcher provides a simple API to manage patched methods. I found while writing [Buttercup](https://buttercup.pw) that managing overwritten methods between environments (Node/Browser/React-Native) was becoming cumbersome, and having a single _agreed-upon_ method of doing so was the best way to go.
 
 ## Usage
-Hot-Patch is a class and can simply be instantiated:
+Hot-Patcher is a class and can simply be instantiated:
 
 ```javascript
-const HotPatch = require("hot-patch");
+const HotPatcher = require("hot-patcher");
 
-const hp = new HotPatch();
+const hp = new HotPatcher();
 ```
 
 Of course, it'd be more useful if it were centrally located to allow for easy patching (such as with a library):
 
 ```javascript
-const HotPatch = require("hot-patch");
+const HotPatch = require("hot-patcher");
 
 let __sharedPatcher;
 
 function getSharedPatcher() {
     if (!__sharedPatcher) {
-        __sharedPatcher = new HotPatch();
+        __sharedPatcher = new HotPatcher();
     }
     return __sharedPatcher;
 }
@@ -70,4 +70,4 @@ getSharedPatcher().execute("randomString", 5) // Generates a random string
 ```
 
 ### Use Sparingly
-The intention of Hot-Patch is not to push every method into a patching instance, but to provide a common API for specific methods which _require_ patching in some specific environments or in situations where users/consumers are expected to provide their own custom implementations.
+The intention of Hot-Patcher is not to push every method into a patching instance, but to provide a common API for specific methods which _require_ patching in some specific environments or in situations where users/consumers are expected to provide their own custom implementations.

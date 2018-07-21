@@ -1,6 +1,6 @@
 {
-  "name": "hot-patch",
-  "version": "0.0.0",
+  "name": "hot-patcher",
+  "version": "0.1.0",
   "description": "Hot method patching framework for handling environmental method differences",
   "main": "source/index.js",
   "scripts": {
@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/perry-mitchell/hot-patch.git"
+    "url": "git+https://github.com/perry-mitchell/hot-patcher.git"
   },
   "keywords": [
     "patch",
@@ -30,9 +30,9 @@
   "author": "Perry Mitchell <perry@perrymitchell.net>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/perry-mitchell/hot-patch/issues"
+    "url": "https://github.com/perry-mitchell/hot-patcher/issues"
   },
-  "homepage": "https://github.com/perry-mitchell/hot-patch#readme",
+  "homepage": "https://github.com/perry-mitchell/hot-patcher#readme",
   "devDependencies": {
     "chai": "^4.1.2",
     "husky": "^0.14.3",
