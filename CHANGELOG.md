@@ -1,5 +1,10 @@
 # Hot-Patcher changelog
 
+## v0.2.0
+_2018-07-22_
+
+ * Add `control` ability
+
 ## v0.1.0
 _2018-07-21_
 
