@@ -6,6 +6,8 @@
 ## About
 Hot-Patcher provides a simple API to manage patched methods. I found while writing [Buttercup](https://buttercup.pw) that managing overwritten methods between environments (Node/Browser/React-Native) was becoming cumbersome, and having a single _agreed-upon_ method of doing so was the best way to go.
 
+Check out the [API documentation](API.md).
+
 ## Usage
 Hot-Patcher is a class and can simply be instantiated:
 
