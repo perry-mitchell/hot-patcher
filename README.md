@@ -8,6 +8,13 @@ Hot-Patcher provides a simple API to manage patched methods. I found while writi
 
 Check out the [API documentation](API.md).
 
+## Installation
+Install Hot-Patcher from [npm](https://www.npmjs.com/package/hot-patcher):
+
+```shell
+npm install hot-patcher --save
+```
+
 ## Usage
 Hot-Patcher is a class and can simply be instantiated:
 
