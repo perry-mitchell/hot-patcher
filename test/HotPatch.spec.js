@@ -1,15 +1,58 @@
-const HotPatch = require("../source/index.js");
+const HotPatcher = require("../source/index.js");
 
-describe("HotPatch", function() {
+describe("HotPatcher", function() {
     it("instantiates without error", function() {
         expect(() => {
-            new HotPatch();
+            new HotPatcher();
         }).to.not.throw();
     });
 
     describe("instance", function() {
         beforeEach(function() {
-            this.patcher = new HotPatch();
+            this.patcher = new HotPatcher();
+        });
+
+        describe("control", function() {
+            beforeEach(function() {
+                this.patcher2 = new HotPatcher();
+            });
+
+            it("sets configuration of target to configuration of controller", function() {
+                this.patcher.control(this.patcher2);
+                expect(this.patcher.configuration).to.equal(this.patcher2.configuration);
+            });
+
+            it("throws if the type is not recognised", function() {
+                expect(() => {
+                    this.patcher.control({});
+                }).to.throw(/Invalid type/);
+            });
+
+            it("copies keys and overwrites target duplicates", function() {
+                const testMethod = () => {};
+                const testMethod2 = () => {};
+                const testMethod3 = () => {};
+                this.patcher.patch("test", testMethod);
+                this.patcher2.patch("test3", testMethod3);
+                this.patcher2.patch("test", testMethod2);
+                this.patcher.control(this.patcher2);
+                expect(this.patcher.get("test")).to.equal(testMethod);
+                expect(this.patcher2.get("test")).to.equal(testMethod);
+                expect(this.patcher2.get("test3")).to.equal(testMethod3);
+            });
+
+            it("copies keys and overwrites own duplicates when configured", function() {
+                const testMethod = () => {};
+                const testMethod2 = () => {};
+                const testMethod3 = () => {};
+                this.patcher.patch("test", testMethod);
+                this.patcher2.patch("test3", testMethod3);
+                this.patcher2.patch("test", testMethod2);
+                this.patcher.control(this.patcher2, /* allow overrides: */ true);
+                expect(this.patcher.get("test")).to.equal(testMethod2);
+                expect(this.patcher2.get("test")).to.equal(testMethod2);
+                expect(this.patcher2.get("test3")).to.equal(testMethod3);
+            });
         });
 
         describe("execute", function() {

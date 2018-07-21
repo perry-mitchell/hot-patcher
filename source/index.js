@@ -1,3 +1,4 @@
+const HOT_PATCHER_TYPE = "@@HOTPATCHER";
 const NOOP = () => {};
 
 function createNewItem(method, boundThis) {
@@ -8,12 +9,13 @@ function createNewItem(method, boundThis) {
     };
 }
 
-class HotPatch {
+class HotPatcher {
     constructor() {
         this._configuration = {
             registry: {},
             getEmptyAction: "null"
         };
+        this.__type__ = HOT_PATCHER_TYPE;
     }
 
     get configuration() {
@@ -26,6 +28,31 @@ class HotPatch {
 
     set getEmptyAction(newAction) {
         this.configuration.getEmptyAction = newAction;
+    }
+
+    control(target, allowTargetOverrides = false) {
+        if (!target || target.__type__ !== HOT_PATCHER_TYPE) {
+            throw new Error(
+                "Failed taking control of target HotPatcher instance: Invalid type or object"
+            );
+        }
+        Object.keys(target.configuration.registry).forEach(foreignKey => {
+            if (this.configuration.registry.hasOwnProperty(foreignKey)) {
+                if (allowTargetOverrides) {
+                    this.configuration.registry[foreignKey] = Object.assign(
+                        {},
+                        target.configuration.registry[foreignKey]
+                    );
+                }
+            } else {
+                this.configuration.registry[foreignKey] = Object.assign(
+                    {},
+                    target.configuration.registry[foreignKey]
+                );
+            }
+        });
+        target._configuration = this.configuration;
+        return this;
     }
 
     execute(key, ...args) {
@@ -78,4 +105,4 @@ class HotPatch {
     }
 }
 
-module.exports = HotPatch;
+module.exports = HotPatcher;
