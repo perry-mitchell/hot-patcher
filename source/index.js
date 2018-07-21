@@ -10,21 +10,35 @@ function createNewItem(method, boundThis) {
 
 class HotPatch {
     constructor() {
-        this._registry = {};
-        this.getEmptyAction = "null";
+        this._configuration = {
+            registry: {},
+            getEmptyAction: "null"
+        };
+    }
+
+    get configuration() {
+        return this._configuration;
+    }
+
+    get getEmptyAction() {
+        return this.configuration.getEmptyAction;
+    }
+
+    set getEmptyAction(newAction) {
+        this.configuration.getEmptyAction = newAction;
     }
 
     execute(key, ...args) {
         const method = this.get(key) || NOOP;
         const boundThis =
-            this._registry[key] && this._registry[key].boundThis !== null
-                ? this._registry[key].boundThis
+            this.configuration.registry[key] && this.configuration.registry[key].boundThis !== null
+                ? this.configuration.registry[key].boundThis
                 : null;
         return method.apply(boundThis, args);
     }
 
     get(key) {
-        const item = this._registry[key];
+        const item = this.configuration.registry[key];
         if (!item) {
             switch (this.getEmptyAction) {
                 case "null":
@@ -45,21 +59,21 @@ class HotPatch {
     }
 
     patch(key, method, boundThis = null) {
-        if (this._registry[key] && this._registry[key].final) {
+        if (this.configuration.registry[key] && this.configuration.registry[key].final) {
             throw new Error(`Failed patching '${key}': Method marked as being final`);
         }
         if (typeof method !== "function") {
             throw new Error(`Failed patching '${key}': Provided method is not a function`);
         }
-        this._registry[key] = createNewItem(method, boundThis);
+        this.configuration.registry[key] = createNewItem(method, boundThis);
         return this;
     }
 
     setFinal(key) {
-        if (!this._registry.hasOwnProperty(key)) {
+        if (!this.configuration.registry.hasOwnProperty(key)) {
             throw new Error(`Failed marking '${key}' as final: No method found for key`);
         }
-        this._registry[key].final = true;
+        this.configuration.registry[key].final = true;
         return this;
     }
 }

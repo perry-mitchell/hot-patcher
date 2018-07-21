@@ -100,9 +100,9 @@ describe("HotPatch", function() {
         describe("setFinal", function() {
             it("marks the item as being final", function() {
                 this.patcher.patch("test", () => {});
-                expect(this.patcher._registry.test.final).to.be.false;
+                expect(this.patcher.configuration.registry.test.final).to.be.false;
                 this.patcher.setFinal("test");
-                expect(this.patcher._registry.test.final).to.be.true;
+                expect(this.patcher.configuration.registry.test.final).to.be.true;
             });
 
             it("throws when no method is found for key", function() {
