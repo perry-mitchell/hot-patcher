@@ -1,4 +1,6 @@
 *.log
 .vscode
 .history
+.nyc_output
+coverage
 node_modules
