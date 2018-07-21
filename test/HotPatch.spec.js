@@ -90,9 +90,7 @@ describe("HotPatch", function() {
             });
 
             it("throws when the item has been marked as being final", function() {
-                this.patcher
-                    .patch("test", () => {})
-                    .setFinal("test");
+                this.patcher.patch("test", () => {}).setFinal("test");
                 expect(() => {
                     this.patcher.patch("test", () => {});
                 }).to.throw(/'test'.+marked as being final/);
@@ -109,7 +107,7 @@ describe("HotPatch", function() {
 
             it("throws when no method is found for key", function() {
                 expect(() => {
-                    this.patcher.setFinal("noexist")
+                    this.patcher.setFinal("noexist");
                 }).to.throw(/'noexist'.+No method found for key/);
             });
         });

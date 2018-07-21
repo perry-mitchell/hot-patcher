@@ -16,8 +16,10 @@ class HotPatch {
 
     execute(key, ...args) {
         const method = this.get(key) || NOOP;
-        const boundThis = this._registry[key] && this._registry[key].boundThis !== null ?
-            this._registry[key].boundThis : null;
+        const boundThis =
+            this._registry[key] && this._registry[key].boundThis !== null
+                ? this._registry[key].boundThis
+                : null;
         return method.apply(boundThis, args);
     }
 
@@ -28,9 +30,15 @@ class HotPatch {
                 case "null":
                     return null;
                 case "throw":
-                    throw new Error(`Failed handling method request: No method provided for override: ${key}`);
+                    throw new Error(
+                        `Failed handling method request: No method provided for override: ${key}`
+                    );
                 default:
-                    throw new Error(`Failed handling request which resulted in an empty method: Invalid empty-action specified: ${this.getEmptyAction}`);
+                    throw new Error(
+                        `Failed handling request which resulted in an empty method: Invalid empty-action specified: ${
+                            this.getEmptyAction
+                        }`
+                    );
             }
         }
         return item.method;
