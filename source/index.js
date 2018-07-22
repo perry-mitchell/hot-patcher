@@ -129,6 +129,16 @@ class HotPatcher {
     }
 
     /**
+     * Check if a method has been patched
+     * @param {String} key The function key
+     * @returns {Boolean} True if already patched
+     * @memberof HotPatcher
+     */
+    isPatched(key) {
+        return !!this.configuration.registry[key];
+    }
+
+    /**
      * Patch a method name
      * @param {String} key The method key to patch
      * @param {Function} method The function to set
@@ -145,6 +155,31 @@ class HotPatcher {
         }
         this.configuration.registry[key] = createNewItem(method, boundThis);
         return this;
+    }
+
+    /**
+     * Patch a method inline, execute it and return the value
+     * Used for patching contents of functions. This method will not apply a patched
+     * function if it has already been patched, allowing for external overrides to
+     * function. It also means that the function is cached so that it is not
+     * instantiated every time the outer function is invoked.
+     * @param {String} key The function key to use
+     * @param {Function} method The function to patch (once, only if not patched)
+     * @param {...*} args Arguments to pass to the function
+     * @returns {*} The output of the patched function
+     * @memberof HotPatcher
+     * @example
+     *  function mySpecialFunction(a, b) {
+     *      return hotPatcher.patchInline("func", (a, b) => {
+     *          return a + b;
+     *      }, a, b);
+     *  }
+     */
+    patchInline(key, method, ...args) {
+        if (!this.isPatched(key)) {
+            this.patch(key, method);
+        }
+        return this.execute(key, ...args);
     }
 
     /**
