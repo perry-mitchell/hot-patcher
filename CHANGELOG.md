@@ -1,5 +1,11 @@
 # Hot-Patcher changelog
 
+## v0.3.0
+_2018-07-22_
+
+ * Add `isPatched` method
+ * Add `patchInline` method
+
 ## v0.2.0
 _2018-07-22_
 
