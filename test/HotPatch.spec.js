@@ -114,6 +114,20 @@ describe("HotPatcher", function() {
             });
         });
 
+        describe("isPatched", function() {
+            beforeEach(function() {
+                this.patcher.patch("test", () => {});
+            });
+
+            it("recognises patched keys", function() {
+                expect(this.patcher.isPatched("test")).to.be.true;
+            });
+
+            it("recognises non-patched keys", function() {
+                expect(this.patcher.isPatched("test2")).to.be.false;
+            });
+        });
+
         describe("patch", function() {
             it("patches methods", function() {
                 const method = () => 10;
@@ -137,6 +151,32 @@ describe("HotPatcher", function() {
                 expect(() => {
                     this.patcher.patch("test", () => {});
                 }).to.throw(/'test'.+marked as being final/);
+            });
+        });
+
+        describe("patchInline", function() {
+            it("runs in-line functions", function() {
+                const spy = sinon.stub().returnsArg(1);
+                const test = (a, b) => this.patcher.patchInline("test", spy, a, b);
+                test(1, 2);
+                expect(spy.calledOnce).to.be.true;
+                expect(spy.calledWithExactly(1, 2)).to.be.true;
+            });
+
+            it("returns value from method", function() {
+                const spy = sinon.stub().returnsArg(1);
+                const test = (a, b) => this.patcher.patchInline("test", spy, a, b);
+                expect(test(1, 2)).to.equal(2);
+            });
+
+            it("allows for patching before execution", function() {
+                const spy1 = sinon.stub().returnsArg(1);
+                const spy2 = sinon.stub().returnsArg(0);
+                const test = (a, b) => this.patcher.patchInline("test", spy1, a, b);
+                this.patcher.patch("test", spy2);
+                expect(test(1, 2)).to.equal(1);
+                expect(spy1.notCalled).to.be.true;
+                expect(spy2.calledOnce).to.be.true;
             });
         });
 
