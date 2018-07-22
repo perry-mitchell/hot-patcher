@@ -78,5 +78,22 @@ randomString(5); // Generates a random string
 getSharedPatcher().execute("randomString", 5) // Generates a random string
 ```
 
+You can check if a method is patched by using `isPatched`: `patcher.isPatched("some method")`.
+
+### Inline patching and execution
+Ideally you could wrap function implementation with a patch call, executing it on demand:
+
+```javascript
+function add(a, b) {
+    return patcher.patchInline("add", (a, b) => a + b, a, b);
+}
+
+patcher.isPatched("add"); // false
+add(1, 2); // 3
+patcher.isPatched("add"); // true
+// calling add() multiple times will call the patched method without "re-patching" it
+// over and over again..
+```
+
 ### Use Sparingly
 The intention of Hot-Patcher is not to push every method into a patching instance, but to provide a common API for specific methods which _require_ patching in some specific environments or in situations where users/consumers are expected to provide their own custom implementations.

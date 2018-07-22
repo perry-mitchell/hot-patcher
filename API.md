@@ -11,7 +11,9 @@ Hot patching manager class
     * [.control(target, [allowTargetOverrides])](#HotPatcher+control) ⇒ [<code>HotPatcher</code>](#HotPatcher)
     * [.execute(key, ...args)](#HotPatcher+execute) ⇒ <code>\*</code>
     * [.get(key)](#HotPatcher+get) ⇒ <code>function</code> \| <code>null</code>
+    * [.isPatched(key)](#HotPatcher+isPatched) ⇒ <code>Boolean</code>
     * [.patch(key, method, [boundThis])](#HotPatcher+patch) ⇒ [<code>HotPatcher</code>](#HotPatcher)
+    * [.patchInline(key, method, ...args)](#HotPatcher+patchInline) ⇒ <code>\*</code>
     * [.setFinal(key)](#HotPatcher+setFinal) ⇒ [<code>HotPatcher</code>](#HotPatcher)
 
 <a name="HotPatcher+configuration"></a>
@@ -79,6 +81,18 @@ does not exist
 | --- | --- | --- |
 | key | <code>String</code> | The method key |
 
+<a name="HotPatcher+isPatched"></a>
+
+### hotPatcher.isPatched(key) ⇒ <code>Boolean</code>
+Check if a method has been patched
+
+**Kind**: instance method of [<code>HotPatcher</code>](#HotPatcher)  
+**Returns**: <code>Boolean</code> - True if already patched  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>String</code> | The function key |
+
 <a name="HotPatcher+patch"></a>
 
 ### hotPatcher.patch(key, method, [boundThis]) ⇒ [<code>HotPatcher</code>](#HotPatcher)
@@ -93,6 +107,32 @@ Patch a method name
 | method | <code>function</code> |  | The function to set |
 | [boundThis] | <code>\*</code> | <code></code> | The 'this' value to use for the method invocation (optional) |
 
+<a name="HotPatcher+patchInline"></a>
+
+### hotPatcher.patchInline(key, method, ...args) ⇒ <code>\*</code>
+Patch a method inline, execute it and return the value
+Used for patching contents of functions. This method will not apply a patched
+function if it has already been patched, allowing for external overrides to
+function. It also means that the function is cached so that it is not
+instantiated every time the outer function is invoked.
+
+**Kind**: instance method of [<code>HotPatcher</code>](#HotPatcher)  
+**Returns**: <code>\*</code> - The output of the patched function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>String</code> | The function key to use |
+| method | <code>function</code> | The function to patch (once, only if not patched) |
+| ...args | <code>\*</code> | Arguments to pass to the function |
+
+**Example**  
+```js
+function mySpecialFunction(a, b) {
+     return hotPatcher.patchInline("func", (a, b) => {
+         return a + b;
+     }, a, b);
+ }
+```
 <a name="HotPatcher+setFinal"></a>
 
 ### hotPatcher.setFinal(key) ⇒ [<code>HotPatcher</code>](#HotPatcher)
