@@ -1,6 +1,6 @@
 {
   "name": "hot-patcher",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Hot method patching framework for handling environmental method differences",
   "main": "source/index.js",
   "scripts": {
