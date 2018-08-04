@@ -95,5 +95,36 @@ patcher.isPatched("add"); // true
 // over and over again..
 ```
 
-### Use Sparingly
+### Plugins - Chaining/Sequencing functions
+You can use Hot-Patcher to create sequences of functions:
+
+```javascript
+patcher.plugin("increment", x => x * 2, x => x * 2);
+
+patcher.execute("increment", 2); // 8
+```
+
+Which is basically syntactic sugar for a regular `patch()` call: 
+
+```javascript
+patcher
+    .patch("increment", x => x * 2, { chain: true })
+    .patch("increment", x => x * 2, { chain: true });
+
+patcher.execute("increment", 2); // 8
+```
+
+Executing a regular `patch()` without `chain: true` will overwrite all chained methods with the new method. 
+
+Calling `patch()` with `chain: true` when a method already exists will simply add the new method after the existing:
+
+```javascript
+patcher
+    .patch("increment", x => x * 2, { chain: false }) // or simply without `chain` specified
+    .patch("increment", x => x * 2, { chain: true });
+
+patcher.execute("increment", 2); // still 8
+```
+
+## Use Sparingly
 The intention of Hot-Patcher is not to push every method into a patching instance, but to provide a common API for specific methods which _require_ patching in some specific environments or in situations where users/consumers are expected to provide their own custom implementations.

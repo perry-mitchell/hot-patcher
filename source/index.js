@@ -1,10 +1,11 @@
+const { sequence } = require("./functions.js");
+
 const HOT_PATCHER_TYPE = "@@HOTPATCHER";
 const NOOP = () => {};
 
-function createNewItem(method, boundThis) {
+function createNewItem(method) {
     return {
-        method,
-        boundThis,
+        methods: [method],
         final: false
     };
 }
@@ -90,11 +91,7 @@ class HotPatcher {
      */
     execute(key, ...args) {
         const method = this.get(key) || NOOP;
-        const boundThis =
-            this.configuration.registry[key] && this.configuration.registry[key].boundThis !== null
-                ? this.configuration.registry[key].boundThis
-                : null;
-        return method.apply(boundThis, args);
+        return method(...args);
     }
 
     /**
@@ -125,7 +122,7 @@ class HotPatcher {
                     );
             }
         }
-        return item.method;
+        return sequence(...item.methods);
     }
 
     /**
@@ -139,21 +136,41 @@ class HotPatcher {
     }
 
     /**
+     * @typedef {Object} PatchOptions
+     * @property {Boolean=} chain - Whether or not to allow chaining execution. Chained
+     *  execution allows for attaching multiple callbacks to a key, where the callbacks
+     *  will be executed in order of when they were patched (oldest to newest), the
+     *  values being passed from one method to another.
+     */
+
+    /**
      * Patch a method name
      * @param {String} key The method key to patch
      * @param {Function} method The function to set
-     * @param {*=} boundThis The 'this' value to use for the method invocation (optional)
+     * @param {PatchOptions=} options Patch options
      * @memberof HotPatcher
      * @returns {HotPatcher} Returns self
      */
-    patch(key, method, boundThis = null) {
+    patch(key, method, { chain = false } = {}) {
         if (this.configuration.registry[key] && this.configuration.registry[key].final) {
             throw new Error(`Failed patching '${key}': Method marked as being final`);
         }
         if (typeof method !== "function") {
             throw new Error(`Failed patching '${key}': Provided method is not a function`);
         }
-        this.configuration.registry[key] = createNewItem(method, boundThis);
+        if (chain) {
+            // Add new method to the chain
+            if (!this.configuration.registry[key]) {
+                // New key, create item
+                this.configuration.registry[key] = createNewItem(method);
+            } else {
+                // Existing, push the method
+                this.configuration.registry[key].methods.push(method);
+            }
+        } else {
+            // Replace the original
+            this.configuration.registry[key] = createNewItem(method);
+        }
         return this;
     }
 
@@ -180,6 +197,22 @@ class HotPatcher {
             this.patch(key, method);
         }
         return this.execute(key, ...args);
+    }
+
+    /**
+     * Patch a method (or methods) in sequential-mode
+     * See `patch()` with the option `chain: true`
+     * @see patch
+     * @param {String} key The key to patch
+     * @param {...Function} methods The methods to patch
+     * @returns {HotPatcher} Returns self
+     * @memberof HotPatcher
+     */
+    plugin(key, ...methods) {
+        methods.forEach(method => {
+            this.patch(key, method, { chain: true });
+        });
+        return this;
     }
 
     /**
