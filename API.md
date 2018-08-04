@@ -1,3 +1,18 @@
+## Classes
+
+<dl>
+<dt><a href="#HotPatcher">HotPatcher</a></dt>
+<dd><p>Hot patching manager class</p>
+</dd>
+</dl>
+
+## Typedefs
+
+<dl>
+<dt><a href="#PatchOptions">PatchOptions</a> : <code>Object</code></dt>
+<dd></dd>
+</dl>
+
 <a name="HotPatcher"></a>
 
 ## HotPatcher
@@ -12,8 +27,9 @@ Hot patching manager class
     * [.execute(key, ...args)](#HotPatcher+execute) ⇒ <code>\*</code>
     * [.get(key)](#HotPatcher+get) ⇒ <code>function</code> \| <code>null</code>
     * [.isPatched(key)](#HotPatcher+isPatched) ⇒ <code>Boolean</code>
-    * [.patch(key, method, [boundThis])](#HotPatcher+patch) ⇒ [<code>HotPatcher</code>](#HotPatcher)
+    * [.patch(key, method, [options])](#HotPatcher+patch) ⇒ [<code>HotPatcher</code>](#HotPatcher)
     * [.patchInline(key, method, ...args)](#HotPatcher+patchInline) ⇒ <code>\*</code>
+    * [.plugin(key, ...methods)](#HotPatcher+plugin) ⇒ [<code>HotPatcher</code>](#HotPatcher)
     * [.setFinal(key)](#HotPatcher+setFinal) ⇒ [<code>HotPatcher</code>](#HotPatcher)
 
 <a name="HotPatcher+configuration"></a>
@@ -95,17 +111,17 @@ Check if a method has been patched
 
 <a name="HotPatcher+patch"></a>
 
-### hotPatcher.patch(key, method, [boundThis]) ⇒ [<code>HotPatcher</code>](#HotPatcher)
+### hotPatcher.patch(key, method, [options]) ⇒ [<code>HotPatcher</code>](#HotPatcher)
 Patch a method name
 
 **Kind**: instance method of [<code>HotPatcher</code>](#HotPatcher)  
 **Returns**: [<code>HotPatcher</code>](#HotPatcher) - Returns self  
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| key | <code>String</code> |  | The method key to patch |
-| method | <code>function</code> |  | The function to set |
-| [boundThis] | <code>\*</code> | <code></code> | The 'this' value to use for the method invocation (optional) |
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>String</code> | The method key to patch |
+| method | <code>function</code> | The function to set |
+| [options] | [<code>PatchOptions</code>](#PatchOptions) | Patch options |
 
 <a name="HotPatcher+patchInline"></a>
 
@@ -133,6 +149,21 @@ function mySpecialFunction(a, b) {
      }, a, b);
  }
 ```
+<a name="HotPatcher+plugin"></a>
+
+### hotPatcher.plugin(key, ...methods) ⇒ [<code>HotPatcher</code>](#HotPatcher)
+Patch a method (or methods) in sequential-mode
+See `patch()` with the option `chain: true`
+
+**Kind**: instance method of [<code>HotPatcher</code>](#HotPatcher)  
+**Returns**: [<code>HotPatcher</code>](#HotPatcher) - Returns self  
+**See**: patch  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>String</code> | The key to patch |
+| ...methods | <code>function</code> | The methods to patch |
+
 <a name="HotPatcher+setFinal"></a>
 
 ### hotPatcher.setFinal(key) ⇒ [<code>HotPatcher</code>](#HotPatcher)
@@ -146,4 +177,14 @@ again will fail with an error.
 | Param | Type | Description |
 | --- | --- | --- |
 | key | <code>String</code> | The key to make final |
+
+<a name="PatchOptions"></a>
+
+## PatchOptions : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| [chain] | <code>Boolean</code> | Whether or not to allow chaining execution. Chained  execution allows for attaching multiple callbacks to a key, where the callbacks  will be executed in order of when they were patched (oldest to newest), the  values being passed from one method to another. |
 
