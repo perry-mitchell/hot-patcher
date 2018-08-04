@@ -199,6 +199,20 @@ describe("HotPatcher", function() {
             });
         });
 
+        describe("plugin", function() {
+            it("calls 'patch' with all methods provided", function() {
+                const meth1 = () => {};
+                const meth2 = () => {};
+                sinon.spy(this.patcher, "patch");
+                this.patcher.plugin("test", meth1, meth2);
+                expect(this.patcher.patch.calledTwice).to.be.true;
+                expect(this.patcher.patch.calledWithExactly("test", meth1, { chain: true })).to.be
+                    .true;
+                expect(this.patcher.patch.calledWithExactly("test", meth2, { chain: true })).to.be
+                    .true;
+            });
+        });
+
         describe("setFinal", function() {
             it("marks the item as being final", function() {
                 this.patcher.patch("test", () => {});

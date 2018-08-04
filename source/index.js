@@ -200,6 +200,22 @@ class HotPatcher {
     }
 
     /**
+     * Patch a method (or methods) in sequential-mode
+     * See `patch()` with the option `chain: true`
+     * @see patch
+     * @param {String} key The key to patch
+     * @param {...Function} methods The methods to patch
+     * @returns {HotPatcher} Returns self
+     * @memberof HotPatcher
+     */
+    plugin(key, ...methods) {
+        methods.forEach(method => {
+            this.patch(key, method, { chain: true });
+        });
+        return this;
+    }
+
+    /**
      * Set a method as being final
      * This sets a method as having been finally overridden. Attempts at overriding
      * again will fail with an error.
