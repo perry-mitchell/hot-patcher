@@ -1,5 +1,14 @@
 # Hot-Patcher changelog
 
+## v0.4.0
+_2018-08-04_
+
+ * API breaking changes:
+   * Removed `this` binding ability in `patch()` method
+   * Added options parameter to `patch()`
+ * Added `plugin` method for chaining
+ * Added `chain` option to `patch()`
+
 ## v0.3.0
 _2018-07-22_
 
