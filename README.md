@@ -95,8 +95,16 @@ patcher.isPatched("add"); // true
 // over and over again..
 ```
 
-### Chaining / Sequences
+### Plugins - Chaining/Sequencing functions
 You can use Hot-Patcher to create sequences of functions:
+
+```javascript
+patcher.plugin("increment", x => x * 2, x => x * 2);
+
+patcher.execute("increment", 2); // 8
+```
+
+Which is basically syntactic sugar for a regular `patch()` call: 
 
 ```javascript
 patcher
