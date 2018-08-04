@@ -3,3 +3,6 @@ node_js:
   - "stable"
   - "8"
   - "6"
+cache:
+  directories:
+    - node_modules
