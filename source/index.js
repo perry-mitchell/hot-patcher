@@ -1,10 +1,11 @@
+const { sequence } = require("./functions.js");
+
 const HOT_PATCHER_TYPE = "@@HOTPATCHER";
 const NOOP = () => {};
 
-function createNewItem(method, boundThis) {
+function createNewItem(method) {
     return {
-        method,
-        boundThis,
+        methods: [method],
         final: false
     };
 }
@@ -90,11 +91,7 @@ class HotPatcher {
      */
     execute(key, ...args) {
         const method = this.get(key) || NOOP;
-        const boundThis =
-            this.configuration.registry[key] && this.configuration.registry[key].boundThis !== null
-                ? this.configuration.registry[key].boundThis
-                : null;
-        return method.apply(boundThis, args);
+        return method(...args);
     }
 
     /**
@@ -125,7 +122,7 @@ class HotPatcher {
                     );
             }
         }
-        return item.method;
+        return sequence(...item.methods);
     }
 
     /**
@@ -140,7 +137,6 @@ class HotPatcher {
 
     /**
      * @typedef {Object} PatchOptions
-     * @property {null|Object=} boundThis - The 'this' value to use for method invocation
      * @property {Boolean=} chain - Whether or not to allow chaining execution. Chained
      *  execution allows for attaching multiple callbacks to a key, where the callbacks
      *  will be executed in order of when they were patched (oldest to newest), the
@@ -155,14 +151,14 @@ class HotPatcher {
      * @memberof HotPatcher
      * @returns {HotPatcher} Returns self
      */
-    patch(key, method, { boundThis = null, chain = false } = {}) {
+    patch(key, method, { chain = false } = {}) {
         if (this.configuration.registry[key] && this.configuration.registry[key].final) {
             throw new Error(`Failed patching '${key}': Method marked as being final`);
         }
         if (typeof method !== "function") {
             throw new Error(`Failed patching '${key}': Provided method is not a function`);
         }
-        this.configuration.registry[key] = createNewItem(method, boundThis);
+        this.configuration.registry[key] = createNewItem(method);
         return this;
     }
 
