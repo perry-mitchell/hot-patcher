@@ -29,29 +29,29 @@ describe("HotPatcher", function() {
             });
 
             it("copies keys and overwrites target duplicates", function() {
-                const testMethod = () => {};
-                const testMethod2 = () => {};
-                const testMethod3 = () => {};
+                const testMethod = () => 1;
+                const testMethod2 = () => 2;
+                const testMethod3 = () => 3;
                 this.patcher.patch("test", testMethod);
                 this.patcher2.patch("test3", testMethod3);
                 this.patcher2.patch("test", testMethod2);
                 this.patcher.control(this.patcher2);
-                expect(this.patcher.get("test")).to.equal(testMethod);
-                expect(this.patcher2.get("test")).to.equal(testMethod);
-                expect(this.patcher2.get("test3")).to.equal(testMethod3);
+                expect(this.patcher.get("test")()).to.equal(1);
+                expect(this.patcher2.get("test")()).to.equal(1);
+                expect(this.patcher2.get("test3")()).to.equal(3);
             });
 
             it("copies keys and overwrites own duplicates when configured", function() {
-                const testMethod = () => {};
-                const testMethod2 = () => {};
-                const testMethod3 = () => {};
+                const testMethod = () => 1;
+                const testMethod2 = () => 2;
+                const testMethod3 = () => 3;
                 this.patcher.patch("test", testMethod);
                 this.patcher2.patch("test3", testMethod3);
                 this.patcher2.patch("test", testMethod2);
                 this.patcher.control(this.patcher2, /* allow overrides: */ true);
-                expect(this.patcher.get("test")).to.equal(testMethod2);
-                expect(this.patcher2.get("test")).to.equal(testMethod2);
-                expect(this.patcher2.get("test3")).to.equal(testMethod3);
+                expect(this.patcher.get("test")()).to.equal(2);
+                expect(this.patcher2.get("test")()).to.equal(2);
+                expect(this.patcher2.get("test3")()).to.equal(3);
             });
         });
 
@@ -71,13 +71,6 @@ describe("HotPatcher", function() {
                 expect(this.spyFn.calledWithExactly(1, 2, 3)).to.be.true;
             });
 
-            it("executes the function with correctly bound 'this'", function() {
-                const testThis = {};
-                this.patcher.patch("test", this.spyFn, { boundThis: testThis });
-                this.patcher.execute("test", 1, 2, 3);
-                expect(this.spyFn.calledOn(testThis)).to.be.true;
-            });
-
             it("executes a NOOP if the item doesn't exist", function() {
                 expect(() => {
                     this.patcher.execute("noexist", 123);
@@ -91,8 +84,8 @@ describe("HotPatcher", function() {
                 this.patcher.patch("test", this.testMethod);
             });
 
-            it("returns the correct method", function() {
-                expect(this.patcher.get("test")).to.equal(this.testMethod);
+            it("returns a correctly-functioning method", function() {
+                expect(this.patcher.get("test")()).to.equal(5);
             });
 
             it("returns null by default if item doesn't exist", function() {
@@ -132,7 +125,7 @@ describe("HotPatcher", function() {
             it("patches methods", function() {
                 const method = () => 10;
                 this.patcher.patch("test", method);
-                expect(this.patcher.get("test")).to.equal(method);
+                expect(this.patcher.get("test")()).to.equal(10);
             });
 
             it("returns 'this'", function() {
