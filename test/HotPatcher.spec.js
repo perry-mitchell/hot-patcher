@@ -145,6 +145,32 @@ describe("HotPatcher", function() {
                     this.patcher.patch("test", () => {});
                 }).to.throw(/'test'.+marked as being final/);
             });
+
+            it("chains methods in a sequence (new)", function() {
+                const one = x => x + 5;
+                const two = x => x + 10;
+                this.patcher
+                    .patch("test", one, { chain: true })
+                    .patch("test", two, { chain: true });
+                expect(this.patcher.execute("test", 5)).to.equal(20);
+            });
+
+            it("chains methods in a sequence (existing)", function() {
+                const one = x => x + 3;
+                const two = x => x + 7;
+                this.patcher.patch("test", one).patch("test", two, { chain: true });
+                expect(this.patcher.execute("test", 4)).to.equal(14);
+            });
+
+            it("overrides chains when chain=false", function() {
+                const one = x => x + 3;
+                const two = x => x + 7;
+                this.patcher
+                    .patch("test", one, { chain: true })
+                    .patch("test", two, { chain: true })
+                    .patch("test", x => x);
+                expect(this.patcher.execute("test", 4)).to.equal(4);
+            });
         });
 
         describe("patchInline", function() {

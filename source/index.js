@@ -158,7 +158,19 @@ class HotPatcher {
         if (typeof method !== "function") {
             throw new Error(`Failed patching '${key}': Provided method is not a function`);
         }
-        this.configuration.registry[key] = createNewItem(method);
+        if (chain) {
+            // Add new method to the chain
+            if (!this.configuration.registry[key]) {
+                // New key, create item
+                this.configuration.registry[key] = createNewItem(method);
+            } else {
+                // Existing, push the method
+                this.configuration.registry[key].methods.push(method);
+            }
+        } else {
+            // Replace the original
+            this.configuration.registry[key] = createNewItem(method);
+        }
         return this;
     }
 
