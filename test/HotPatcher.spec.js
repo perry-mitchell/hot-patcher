@@ -73,7 +73,7 @@ describe("HotPatcher", function() {
 
             it("executes the function with correctly bound 'this'", function() {
                 const testThis = {};
-                this.patcher.patch("test", this.spyFn, testThis);
+                this.patcher.patch("test", this.spyFn, { boundThis: testThis });
                 this.patcher.execute("test", 1, 2, 3);
                 expect(this.spyFn.calledOn(testThis)).to.be.true;
             });

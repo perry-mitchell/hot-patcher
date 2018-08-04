@@ -139,14 +139,23 @@ class HotPatcher {
     }
 
     /**
+     * @typedef {Object} PatchOptions
+     * @property {null|Object=} boundThis - The 'this' value to use for method invocation
+     * @property {Boolean=} chain - Whether or not to allow chaining execution. Chained
+     *  execution allows for attaching multiple callbacks to a key, where the callbacks
+     *  will be executed in order of when they were patched (oldest to newest), the
+     *  values being passed from one method to another.
+     */
+
+    /**
      * Patch a method name
      * @param {String} key The method key to patch
      * @param {Function} method The function to set
-     * @param {*=} boundThis The 'this' value to use for the method invocation (optional)
+     * @param {PatchOptions=} options Patch options
      * @memberof HotPatcher
      * @returns {HotPatcher} Returns self
      */
-    patch(key, method, boundThis = null) {
+    patch(key, method, { boundThis = null, chain = false } = {}) {
         if (this.configuration.registry[key] && this.configuration.registry[key].final) {
             throw new Error(`Failed patching '${key}': Method marked as being final`);
         }
