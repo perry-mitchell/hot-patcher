@@ -24,45 +24,39 @@ const HotPatcher = require("hot-patcher");
 const hp = new HotPatcher();
 ```
 
-Of course, it'd be more useful if it were centrally located to allow for easy patching (such as with a library):
+Hot-Patcher is designed to be used with patchable tools:
 
 ```javascript
-const HotPatch = require("hot-patcher");
+const HotPatcher = require("hot-patcher");
 
-let __sharedPatcher;
-
-function getSharedPatcher() {
-    if (!__sharedPatcher) {
-        __sharedPatcher = new HotPatcher();
+class MyHelper {
+    constructor() {
+        this.patcher = new HotPatcher();
     }
-    return __sharedPatcher;
+
+    increment(arg) {
+        return this.patcher.patchInline("increment", someArg => {
+            return someArg + 1;
+        }, arg);
+    }
 }
 
-module.exports = {
-    getSharedPatcher
-};
+module.exports = MyHelper;
 ```
 
-Patch methods when required:
+You can then patch methods when required:
 
 ```javascript
-// Get the patcher instance (the following is just an example, and a new instance
-// could just as easily have been created here):
-const { getSharedPatcher } = require("./patching.js");
+const MyHelper = require("./MyHelper.js");
 
-/**
- * Generate a random string
- * This should be overridden/patched on different platforms
- */
-function generateRandomString(length) {
-    // ... implementation skipped
+function getHelper() {
+    const helper = new MyHelper();
+    helper.patch("increment", val => val + 2);
+    return helper;
 }
 
-getSharedPatcher().patch("randomString", generateRandomString);
-
-// Still export such methods for testing etc.
 module.exports = {
-    generateRandomString
+    getHelper
 };
 ```
 
