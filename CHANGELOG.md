@@ -1,5 +1,10 @@
 # Hot-Patcher changelog
 
+## v0.5.0
+_2018-11-06_
+
+ * Added `restore` method for restoring overridden method definitions
+
 ## v0.4.0
 _2018-08-04_
 

@@ -30,6 +30,7 @@ Hot patching manager class
     * [.patch(key, method, [options])](#HotPatcher+patch) ⇒ [<code>HotPatcher</code>](#HotPatcher)
     * [.patchInline(key, method, ...args)](#HotPatcher+patchInline) ⇒ <code>\*</code>
     * [.plugin(key, ...methods)](#HotPatcher+plugin) ⇒ [<code>HotPatcher</code>](#HotPatcher)
+    * [.restore(key)](#HotPatcher+restore)
     * [.setFinal(key)](#HotPatcher+setFinal) ⇒ [<code>HotPatcher</code>](#HotPatcher)
 
 <a name="HotPatcher+configuration"></a>
@@ -163,6 +164,17 @@ See `patch()` with the option `chain: true`
 | --- | --- | --- |
 | key | <code>String</code> | The key to patch |
 | ...methods | <code>function</code> | The methods to patch |
+
+<a name="HotPatcher+restore"></a>
+
+### hotPatcher.restore(key)
+Restore a patched method if it has been overridden
+
+**Kind**: instance method of [<code>HotPatcher</code>](#HotPatcher)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| key | <code>String</code> | The method key |
 
 <a name="HotPatcher+setFinal"></a>
 
