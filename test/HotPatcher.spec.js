@@ -171,6 +171,30 @@ describe("HotPatcher", function() {
                     .patch("test", x => x);
                 expect(this.patcher.execute("test", 4)).to.equal(4);
             });
+
+            it("keeps original patched method when overriding once", function() {
+                const methodA = () => {};
+                const methodB = () => {};
+                this.patcher.patch("test", methodA).patch("test", methodB);
+                expect(this.patcher.configuration.registry["test"]).to.have.property(
+                    "original",
+                    methodA
+                );
+            });
+
+            it("keeps original patched method when overriding twice", function() {
+                const methodA = () => {};
+                const methodB = () => {};
+                const methodC = () => {};
+                this.patcher
+                    .patch("test", methodA)
+                    .patch("test", methodB)
+                    .patch("test", methodC);
+                expect(this.patcher.configuration.registry["test"]).to.have.property(
+                    "original",
+                    methodA
+                );
+            });
         });
 
         describe("patchInline", function() {
@@ -210,6 +234,35 @@ describe("HotPatcher", function() {
                     .true;
                 expect(this.patcher.patch.calledWithExactly("test", meth2, { chain: true })).to.be
                     .true;
+            });
+        });
+
+        describe("restore", function() {
+            it("throws if no patched method present", function() {
+                expect(() => {
+                    this.patcher.restore("test");
+                }).to.throw(/No method present for key/i);
+            });
+
+            it("throws if original method is not a function", function() {
+                this.patcher.patch("test", () => {});
+                this.patcher.configuration.registry["test"].original = false;
+                expect(() => {
+                    this.patcher.restore("test");
+                }).to.throw(/Original method not found or of invalid type for key/i);
+            });
+
+            it("restores an overridden method", function() {
+                const methodA = () => {};
+                const methodB = () => {};
+                this.patcher.patch("test", methodA).patch("test", methodB);
+                expect(this.patcher.configuration.registry["test"].methods).to.deep.equal([
+                    methodB
+                ]);
+                this.patcher.restore("test");
+                expect(this.patcher.configuration.registry["test"].methods).to.deep.equal([
+                    methodA
+                ]);
             });
         });
 

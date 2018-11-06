@@ -5,6 +5,7 @@ const NOOP = () => {};
 
 function createNewItem(method) {
     return {
+        original: method,
         methods: [method],
         final: false
     };
@@ -169,7 +170,14 @@ class HotPatcher {
             }
         } else {
             // Replace the original
-            this.configuration.registry[key] = createNewItem(method);
+            if (this.isPatched(key)) {
+                const { original } = this.configuration.registry[key];
+                this.configuration.registry[key] = Object.assign(createNewItem(method), {
+                    original
+                });
+            } else {
+                this.configuration.registry[key] = createNewItem(method);
+            }
         }
         return this;
     }
@@ -213,6 +221,22 @@ class HotPatcher {
             this.patch(key, method, { chain: true });
         });
         return this;
+    }
+
+    /**
+     * Restore a patched method if it has been overridden
+     * @param {String} key The method key
+     * @memberof HotPatcher
+     */
+    restore(key) {
+        if (!this.isPatched(key)) {
+            throw new Error(`Failed restoring method: No method present for key: ${key}`);
+        } else if (typeof this.configuration.registry[key].original !== "function") {
+            throw new Error(
+                `Failed restoring method: Original method not found or of invalid type for key: ${key}`
+            );
+        }
+        this.configuration.registry[key].methods = [this.configuration.registry[key].original];
     }
 
     /**
