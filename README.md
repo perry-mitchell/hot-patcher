@@ -120,5 +120,22 @@ patcher
 patcher.execute("increment", 2); // still 8
 ```
 
+### Restoring methods
+Methods can be restored to their _originally patched function_ by calling the `restore` method:
+
+```javascript
+const methodA = () => {};
+const methodB = () => {};
+
+patcher
+    // methodA is now the current (and original)
+    .patch("someMethod", methodA)
+    // methodB is now the current
+    .patch("someMethod", methodB);
+
+// Restore "someMethod" to methodA (original)
+patcher.restore("someMethod");
+```
+
 ## Use Sparingly
 The intention of Hot-Patcher is not to push every method into a patching instance, but to provide a common API for specific methods which _require_ patching in some specific environments or in situations where users/consumers are expected to provide their own custom implementations.
