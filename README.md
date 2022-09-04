@@ -19,7 +19,7 @@ npm install hot-patcher --save
 Hot-Patcher is a class and can simply be instantiated:
 
 ```javascript
-const HotPatcher = require("hot-patcher");
+const { HotPatcher } = require("hot-patcher");
 
 const hp = new HotPatcher();
 ```
