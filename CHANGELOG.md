@@ -1,5 +1,11 @@
 # Hot-Patcher changelog
 
+## v1.0.0
+_2022-09-04_
+
+ * Typescript
+ * Named export: `HotPatcher`
+
 ## v0.5.0
 _2018-11-06_
 

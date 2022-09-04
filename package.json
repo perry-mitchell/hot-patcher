@@ -2,7 +2,8 @@
   "name": "hot-patcher",
   "version": "0.5.0",
   "description": "Hot method patching framework for handling environmental method differences",
-  "main": "source/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "npm run clean && tsc",
     "clean": "rimraf dist",
