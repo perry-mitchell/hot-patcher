@@ -7,17 +7,24 @@
     "build": "npm run clean && tsc",
     "clean": "rimraf dist",
     "format": "prettier --write '{source,test}/**/*.js'",
-    "precommit": "lint-staged",
+    "prepublishOnly": "npm run build",
     "test": "run-s test:specs test:coverage test:format",
     "test:coverage": "nyc check-coverage --statements 94 --lines 97 --functions 100 --branches 87",
     "test:format": "prettier --check '{source,test}/**/*.js'",
     "test:specs": "npm run build && nyc mocha -r test/index.js 'test/**/*.spec.js'"
   },
+  "files": [
+    "dist/*"
+  ],
   "lint-staged": {
     "{source,test}/**/*.js": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "repository": {
     "type": "git",
