@@ -1,9 +1,16 @@
-const { sequence } = require("./functions.js");
+import { sequence } from "./functions";
+import { PatchFn, PatchOptions } from "./types";
+
+interface RegisteredItem<T> {
+    original: PatchFn<T>;
+    methods: [PatchFn<T>];
+    final: boolean;
+}
 
 const HOT_PATCHER_TYPE = "@@HOTPATCHER";
 const NOOP = () => {};
 
-function createNewItem(method) {
+function createNewItem<T>(method: PatchFn<T>): RegisteredItem<T> {
     return {
         original: method,
         methods: [method],
@@ -14,7 +21,13 @@ function createNewItem(method) {
 /**
  * Hot patching manager class
  */
-class HotPatcher {
+export class HotPatcher {
+    protected _configuration: {
+        getEmptyAction: "null" | "throw";
+        registry: Record<string, RegisteredItem<unknown>>;
+    };
+    public readonly __type__: string;
+
     constructor() {
         this._configuration = {
             registry: {},
@@ -25,8 +38,6 @@ class HotPatcher {
 
     /**
      * Configuration object reference
-     * @type {Object}
-     * @memberof HotPatcher
      * @readonly
      */
     get configuration() {
@@ -36,28 +47,25 @@ class HotPatcher {
     /**
      * The action to take when a non-set method is requested
      * Possible values: null/throw
-     * @type {String}
-     * @memberof HotPatcher
      */
     get getEmptyAction() {
         return this.configuration.getEmptyAction;
     }
 
-    set getEmptyAction(newAction) {
+    set getEmptyAction(newAction: "null" | "throw") {
         this.configuration.getEmptyAction = newAction;
     }
 
     /**
      * Control another hot-patcher instance
      * Force the remote instance to use patched methods from calling instance
-     * @param {HotPatcher} target The target instance to control
-     * @param {Boolean=} allowTargetOverrides Allow the target to override patched methods on
+     * @param target The target instance to control
+     * @param allowTargetOverrides Allow the target to override patched methods on
      * the controller (default is false)
-     * @memberof HotPatcher
-     * @returns {HotPatcher} Returns self
+     * @returns Returns self
      * @throws {Error} Throws if the target is invalid
      */
-    control(target, allowTargetOverrides = false) {
+    control(target: HotPatcher, allowTargetOverrides: boolean = false): this {
         if (!target || target.__type__ !== HOT_PATCHER_TYPE) {
             throw new Error(
                 "Failed taking control of target HotPatcher instance: Invalid type or object"
@@ -84,28 +92,26 @@ class HotPatcher {
 
     /**
      * Execute a patched method
-     * @param {String} key The method key
-     * @param {...*} args Arguments to pass to the method (optional)
-     * @memberof HotPatcher
+     * @param key The method key
+     * @param args Arguments to pass to the method (optional)
      * @see HotPatcher#get
-     * @returns {*} The output of the called method
+     * @returns The output of the called method
      */
-    execute(key, ...args) {
+    execute<T>(key: string, ...args: Array<any>): T {
         const method = this.get(key) || NOOP;
         return method(...args);
     }
 
     /**
      * Get a method for a key
-     * @param {String} key The method key
-     * @returns {Function|null} Returns the requested function or null if the function
+     * @param key The method key
+     * @returns Returns the requested function or null if the function
      * does not exist and the host is configured to return null (and not throw)
-     * @memberof HotPatcher
      * @throws {Error} Throws if the configuration specifies to throw and the method
      * does not exist
      * @throws {Error} Throws if the `getEmptyAction` value is invalid
      */
-    get(key) {
+    get(key: string): Function | null {
         const item = this.configuration.registry[key];
         if (!item) {
             switch (this.getEmptyAction) {
@@ -128,31 +134,22 @@ class HotPatcher {
 
     /**
      * Check if a method has been patched
-     * @param {String} key The function key
-     * @returns {Boolean} True if already patched
-     * @memberof HotPatcher
+     * @param key The function key
+     * @returns True if already patched
      */
-    isPatched(key) {
+    isPatched(key: string): boolean {
         return !!this.configuration.registry[key];
     }
 
     /**
-     * @typedef {Object} PatchOptions
-     * @property {Boolean=} chain - Whether or not to allow chaining execution. Chained
-     *  execution allows for attaching multiple callbacks to a key, where the callbacks
-     *  will be executed in order of when they were patched (oldest to newest), the
-     *  values being passed from one method to another.
-     */
-
-    /**
      * Patch a method name
-     * @param {String} key The method key to patch
-     * @param {Function} method The function to set
-     * @param {PatchOptions=} options Patch options
-     * @memberof HotPatcher
-     * @returns {HotPatcher} Returns self
+     * @param key The method key to patch
+     * @param method The function to set
+     * @param opts Patch options
+     * @returns Returns self
      */
-    patch(key, method, { chain = false } = {}) {
+    patch<T>(key: string, method: PatchFn<T>, opts: PatchOptions = {}): this {
+        const { chain = false } = opts;
         if (this.configuration.registry[key] && this.configuration.registry[key].final) {
             throw new Error(`Failed patching '${key}': Method marked as being final`);
         }
@@ -163,7 +160,7 @@ class HotPatcher {
             // Add new method to the chain
             if (!this.configuration.registry[key]) {
                 // New key, create item
-                this.configuration.registry[key] = createNewItem(method);
+                this.configuration.registry[key] = createNewItem<T>(method);
             } else {
                 // Existing, push the method
                 this.configuration.registry[key].methods.push(method);
@@ -172,11 +169,11 @@ class HotPatcher {
             // Replace the original
             if (this.isPatched(key)) {
                 const { original } = this.configuration.registry[key];
-                this.configuration.registry[key] = Object.assign(createNewItem(method), {
+                this.configuration.registry[key] = Object.assign(createNewItem<T>(method), {
                     original
                 });
             } else {
-                this.configuration.registry[key] = createNewItem(method);
+                this.configuration.registry[key] = createNewItem<T>(method);
             }
         }
         return this;
@@ -188,11 +185,10 @@ class HotPatcher {
      * function if it has already been patched, allowing for external overrides to
      * function. It also means that the function is cached so that it is not
      * instantiated every time the outer function is invoked.
-     * @param {String} key The function key to use
-     * @param {Function} method The function to patch (once, only if not patched)
-     * @param {...*} args Arguments to pass to the function
-     * @returns {*} The output of the patched function
-     * @memberof HotPatcher
+     * @param key The function key to use
+     * @param method The function to patch (once, only if not patched)
+     * @param args Arguments to pass to the function
+     * @returns The output of the patched function
      * @example
      *  function mySpecialFunction(a, b) {
      *      return hotPatcher.patchInline("func", (a, b) => {
@@ -200,23 +196,22 @@ class HotPatcher {
      *      }, a, b);
      *  }
      */
-    patchInline(key, method, ...args) {
+    patchInline<T>(key: string, method: PatchFn<T>, ...args: Array<any>): T {
         if (!this.isPatched(key)) {
-            this.patch(key, method);
+            this.patch<T>(key, method);
         }
-        return this.execute(key, ...args);
+        return this.execute<T>(key, ...args);
     }
 
     /**
      * Patch a method (or methods) in sequential-mode
      * See `patch()` with the option `chain: true`
      * @see patch
-     * @param {String} key The key to patch
-     * @param {...Function} methods The methods to patch
-     * @returns {HotPatcher} Returns self
-     * @memberof HotPatcher
+     * @param key The key to patch
+     * @param methods The methods to patch
+     * @returns Returns self
      */
-    plugin(key, ...methods) {
+    plugin<T>(key: string, ...methods: Array<PatchFn<T>>): this {
         methods.forEach(method => {
             this.patch(key, method, { chain: true });
         });
@@ -225,10 +220,10 @@ class HotPatcher {
 
     /**
      * Restore a patched method if it has been overridden
-     * @param {String} key The method key
-     * @memberof HotPatcher
+     * @param key The method key
+     * @returns Returns self
      */
-    restore(key) {
+    restore(key: string): this {
         if (!this.isPatched(key)) {
             throw new Error(`Failed restoring method: No method present for key: ${key}`);
         } else if (typeof this.configuration.registry[key].original !== "function") {
@@ -237,17 +232,17 @@ class HotPatcher {
             );
         }
         this.configuration.registry[key].methods = [this.configuration.registry[key].original];
+        return this;
     }
 
     /**
      * Set a method as being final
      * This sets a method as having been finally overridden. Attempts at overriding
      * again will fail with an error.
-     * @param {String} key The key to make final
-     * @memberof HotPatcher
-     * @returns {HotPatcher} Returns self
+     * @param key The key to make final
+     * @returns Returns self
      */
-    setFinal(key) {
+    setFinal(key: string): this {
         if (!this.configuration.registry.hasOwnProperty(key)) {
             throw new Error(`Failed marking '${key}' as final: No method found for key`);
         }
@@ -255,5 +250,3 @@ class HotPatcher {
         return this;
     }
 }
-
-module.exports = HotPatcher;
