@@ -1,34 +1,34 @@
-const HotPatcher = require("../source/index.js");
+const { HotPatcher } = require("../dist/patcher.js");
 
-describe("HotPatcher", function() {
-    it("instantiates without error", function() {
+describe("HotPatcher", function () {
+    it("instantiates without error", function () {
         expect(() => {
             new HotPatcher();
         }).to.not.throw();
     });
 
-    describe("instance", function() {
-        beforeEach(function() {
+    describe("instance", function () {
+        beforeEach(function () {
             this.patcher = new HotPatcher();
         });
 
-        describe("control", function() {
-            beforeEach(function() {
+        describe("control", function () {
+            beforeEach(function () {
                 this.patcher2 = new HotPatcher();
             });
 
-            it("sets configuration of target to configuration of controller", function() {
+            it("sets configuration of target to configuration of controller", function () {
                 this.patcher.control(this.patcher2);
                 expect(this.patcher.configuration).to.equal(this.patcher2.configuration);
             });
 
-            it("throws if the type is not recognised", function() {
+            it("throws if the type is not recognised", function () {
                 expect(() => {
                     this.patcher.control({});
                 }).to.throw(/Invalid type/);
             });
 
-            it("copies keys and overwrites target duplicates", function() {
+            it("copies keys and overwrites target duplicates", function () {
                 const testMethod = () => 1;
                 const testMethod2 = () => 2;
                 const testMethod3 = () => 3;
@@ -41,7 +41,7 @@ describe("HotPatcher", function() {
                 expect(this.patcher2.get("test3")()).to.equal(3);
             });
 
-            it("copies keys and overwrites own duplicates when configured", function() {
+            it("copies keys and overwrites own duplicates when configured", function () {
                 const testMethod = () => 1;
                 const testMethod2 = () => 2;
                 const testMethod3 = () => 3;
@@ -55,51 +55,51 @@ describe("HotPatcher", function() {
             });
         });
 
-        describe("execute", function() {
-            beforeEach(function() {
+        describe("execute", function () {
+            beforeEach(function () {
                 this.spyFn = sinon.spy();
                 this.patcher.patch("test", this.spyFn);
             });
 
-            it("executes the function provided", function() {
+            it("executes the function provided", function () {
                 this.patcher.execute("test");
                 expect(this.spyFn.calledOnce).to.be.true;
             });
 
-            it("executes the function with specified parameters", function() {
+            it("executes the function with specified parameters", function () {
                 this.patcher.execute("test", 1, 2, 3);
                 expect(this.spyFn.calledWithExactly(1, 2, 3)).to.be.true;
             });
 
-            it("executes a NOOP if the item doesn't exist", function() {
+            it("executes a NOOP if the item doesn't exist", function () {
                 expect(() => {
                     this.patcher.execute("noexist", 123);
                 }).to.not.throw();
             });
         });
 
-        describe("get", function() {
-            beforeEach(function() {
+        describe("get", function () {
+            beforeEach(function () {
                 this.testMethod = () => 5;
                 this.patcher.patch("test", this.testMethod);
             });
 
-            it("returns a correctly-functioning method", function() {
+            it("returns a correctly-functioning method", function () {
                 expect(this.patcher.get("test")()).to.equal(5);
             });
 
-            it("returns null by default if item doesn't exist", function() {
+            it("returns null by default if item doesn't exist", function () {
                 expect(this.patcher.get("noexist")).to.be.null;
             });
 
-            it("throws, when configured, if item doesn't exist", function() {
+            it("throws, when configured, if item doesn't exist", function () {
                 this.patcher.getEmptyAction = "throw";
                 expect(() => {
                     this.patcher.get("noexist");
                 }).to.throw(/No method provided.+noexist/);
             });
 
-            it("throws, when configured incorrectly, if item doesn't exist", function() {
+            it("throws, when configured incorrectly, if item doesn't exist", function () {
                 this.patcher.getEmptyAction = "invalid!!!";
                 expect(() => {
                     this.patcher.get("noexist");
@@ -107,46 +107,46 @@ describe("HotPatcher", function() {
             });
         });
 
-        describe("isPatched", function() {
-            beforeEach(function() {
+        describe("isPatched", function () {
+            beforeEach(function () {
                 this.patcher.patch("test", () => {});
             });
 
-            it("recognises patched keys", function() {
+            it("recognises patched keys", function () {
                 expect(this.patcher.isPatched("test")).to.be.true;
             });
 
-            it("recognises non-patched keys", function() {
+            it("recognises non-patched keys", function () {
                 expect(this.patcher.isPatched("test2")).to.be.false;
             });
         });
 
-        describe("patch", function() {
-            it("patches methods", function() {
+        describe("patch", function () {
+            it("patches methods", function () {
                 const method = () => 10;
                 this.patcher.patch("test", method);
                 expect(this.patcher.get("test")()).to.equal(10);
             });
 
-            it("returns 'this'", function() {
+            it("returns 'this'", function () {
                 const out = this.patcher.patch("test", () => {});
                 expect(out).to.equal(this.patcher);
             });
 
-            it("throws when method is not a function", function() {
+            it("throws when method is not a function", function () {
                 expect(() => {
                     this.patcher.patch("test", 2);
                 }).to.throw(/'test'.+not a function/);
             });
 
-            it("throws when the item has been marked as being final", function() {
+            it("throws when the item has been marked as being final", function () {
                 this.patcher.patch("test", () => {}).setFinal("test");
                 expect(() => {
                     this.patcher.patch("test", () => {});
                 }).to.throw(/'test'.+marked as being final/);
             });
 
-            it("chains methods in a sequence (new)", function() {
+            it("chains methods in a sequence (new)", function () {
                 const one = x => x + 5;
                 const two = x => x + 10;
                 this.patcher
@@ -155,14 +155,14 @@ describe("HotPatcher", function() {
                 expect(this.patcher.execute("test", 5)).to.equal(20);
             });
 
-            it("chains methods in a sequence (existing)", function() {
+            it("chains methods in a sequence (existing)", function () {
                 const one = x => x + 3;
                 const two = x => x + 7;
                 this.patcher.patch("test", one).patch("test", two, { chain: true });
                 expect(this.patcher.execute("test", 4)).to.equal(14);
             });
 
-            it("overrides chains when chain=false", function() {
+            it("overrides chains when chain=false", function () {
                 const one = x => x + 3;
                 const two = x => x + 7;
                 this.patcher
@@ -172,7 +172,7 @@ describe("HotPatcher", function() {
                 expect(this.patcher.execute("test", 4)).to.equal(4);
             });
 
-            it("keeps original patched method when overriding once", function() {
+            it("keeps original patched method when overriding once", function () {
                 const methodA = () => {};
                 const methodB = () => {};
                 this.patcher.patch("test", methodA).patch("test", methodB);
@@ -182,14 +182,11 @@ describe("HotPatcher", function() {
                 );
             });
 
-            it("keeps original patched method when overriding twice", function() {
+            it("keeps original patched method when overriding twice", function () {
                 const methodA = () => {};
                 const methodB = () => {};
                 const methodC = () => {};
-                this.patcher
-                    .patch("test", methodA)
-                    .patch("test", methodB)
-                    .patch("test", methodC);
+                this.patcher.patch("test", methodA).patch("test", methodB).patch("test", methodC);
                 expect(this.patcher.configuration.registry["test"]).to.have.property(
                     "original",
                     methodA
@@ -197,8 +194,8 @@ describe("HotPatcher", function() {
             });
         });
 
-        describe("patchInline", function() {
-            it("runs in-line functions", function() {
+        describe("patchInline", function () {
+            it("runs in-line functions", function () {
                 const spy = sinon.stub().returnsArg(1);
                 const test = (a, b) => this.patcher.patchInline("test", spy, a, b);
                 test(1, 2);
@@ -206,13 +203,13 @@ describe("HotPatcher", function() {
                 expect(spy.calledWithExactly(1, 2)).to.be.true;
             });
 
-            it("returns value from method", function() {
+            it("returns value from method", function () {
                 const spy = sinon.stub().returnsArg(1);
                 const test = (a, b) => this.patcher.patchInline("test", spy, a, b);
                 expect(test(1, 2)).to.equal(2);
             });
 
-            it("allows for patching before execution", function() {
+            it("allows for patching before execution", function () {
                 const spy1 = sinon.stub().returnsArg(1);
                 const spy2 = sinon.stub().returnsArg(0);
                 const test = (a, b) => this.patcher.patchInline("test", spy1, a, b);
@@ -223,8 +220,8 @@ describe("HotPatcher", function() {
             });
         });
 
-        describe("plugin", function() {
-            it("calls 'patch' with all methods provided", function() {
+        describe("plugin", function () {
+            it("calls 'patch' with all methods provided", function () {
                 const meth1 = () => {};
                 const meth2 = () => {};
                 sinon.spy(this.patcher, "patch");
@@ -237,14 +234,14 @@ describe("HotPatcher", function() {
             });
         });
 
-        describe("restore", function() {
-            it("throws if no patched method present", function() {
+        describe("restore", function () {
+            it("throws if no patched method present", function () {
                 expect(() => {
                     this.patcher.restore("test");
                 }).to.throw(/No method present for key/i);
             });
 
-            it("throws if original method is not a function", function() {
+            it("throws if original method is not a function", function () {
                 this.patcher.patch("test", () => {});
                 this.patcher.configuration.registry["test"].original = false;
                 expect(() => {
@@ -252,7 +249,7 @@ describe("HotPatcher", function() {
                 }).to.throw(/Original method not found or of invalid type for key/i);
             });
 
-            it("restores an overridden method", function() {
+            it("restores an overridden method", function () {
                 const methodA = () => {};
                 const methodB = () => {};
                 this.patcher.patch("test", methodA).patch("test", methodB);
@@ -266,15 +263,15 @@ describe("HotPatcher", function() {
             });
         });
 
-        describe("setFinal", function() {
-            it("marks the item as being final", function() {
+        describe("setFinal", function () {
+            it("marks the item as being final", function () {
                 this.patcher.patch("test", () => {});
                 expect(this.patcher.configuration.registry.test.final).to.be.false;
                 this.patcher.setFinal("test");
                 expect(this.patcher.configuration.registry.test.final).to.be.true;
             });
 
-            it("throws when no method is found for key", function() {
+            it("throws when no method is found for key", function () {
                 expect(() => {
                     this.patcher.setFinal("noexist");
                 }).to.throw(/'noexist'.+No method found for key/);
