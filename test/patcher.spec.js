@@ -1,4 +1,4 @@
-const { HotPatcher } = require("../dist/patcher.js");
+const { HotPatcher } = require("../dist/index.js");
 
 describe("HotPatcher", function () {
     it("instantiates without error", function () {

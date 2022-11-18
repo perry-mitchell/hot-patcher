@@ -1,2 +1,2 @@
-export { HotPatcher } from "./patcher";
-export * from "./types";
+export { HotPatcher } from "./patcher.js";
+export * from "./types.js";
