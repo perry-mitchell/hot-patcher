@@ -15,6 +15,8 @@ Install Hot-Patcher from [npm](https://www.npmjs.com/package/hot-patcher):
 npm install hot-patcher --save
 ```
 
+**NB:** This is an ESM library.
+
 ## Usage
 
 Hot-Patcher is a class and can simply be instantiated:

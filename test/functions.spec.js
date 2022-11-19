@@ -1,4 +1,6 @@
-const { sequence } = require("../dist/functions.js");
+import { expect } from "chai";
+import sinon from "sinon";
+import { sequence } from "../dist/functions.js";
 
 describe("functions", function () {
     describe("sequence", function () {

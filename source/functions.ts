@@ -1,4 +1,4 @@
-import { PatchFn } from "./types";
+import { PatchFn } from "./types.js";
 
 export function sequence<T>(...methods: Array<PatchFn<T>>): (...args: Array<any>) => T {
     if (methods.length === 0) {

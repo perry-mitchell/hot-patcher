@@ -1,5 +1,5 @@
-import { sequence } from "./functions";
-import { PatchFn, PatchOptions } from "./types";
+import { sequence } from "./functions.js";
+import { PatchFn, PatchOptions } from "./types.js";
 
 interface RegisteredItem<T> {
     original: PatchFn<T>;
