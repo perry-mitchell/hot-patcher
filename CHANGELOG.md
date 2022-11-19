@@ -1,10 +1,17 @@
 # Hot-Patcher changelog
 
+## v2.0.0
+_2022-11-19_
+
+ * **ESM**
+
 ## v1.0.0
 _2022-09-04_
 
  * Typescript
  * Named export: `HotPatcher`
+
+__Deprecated: Do not use.__
 
 ## v0.5.0
 _2018-11-06_
