@@ -1,4 +1,6 @@
-const { HotPatcher } = require("../dist/index.js");
+import { expect } from "chai";
+import sinon from "sinon";
+import { HotPatcher } from "../dist/index.js";
 
 describe("HotPatcher", function () {
     it("instantiates without error", function () {
