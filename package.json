@@ -1,6 +1,6 @@
 {
   "name": "hot-patcher",
-  "version": "1.0.0-r03",
+  "version": "1.0.0",
   "description": "Hot method patching framework for handling environmental method differences",
   "exports": "./dist/index.js",
   "types": "./dist/index.d.ts",
