@@ -1,5 +1,10 @@
 # Hot-Patcher changelog
 
+## v2.0.1
+_2023-07-17_
+
+ * React-Native entry in `package.json`
+
 ## v2.0.0
 _2022-11-19_
 
